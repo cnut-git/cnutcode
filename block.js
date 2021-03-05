@@ -342,6 +342,7 @@ const LibraryCreator = {
 				template: template
 			}
 		}
+		
 		// 블록 추가하기
 		for (let i in blocksJSON) {
 			let block = blocksJSON[i];
@@ -360,3 +361,54 @@ const LibraryCreator = {
 		}
 	}
 }
+const blocks = [
+	{
+		name: 'split',
+		template: '%1split하기%2',
+		skeleton: 'basic',
+		color: {
+			default: '#15b01a',
+			darken: '#15b01a'
+		},
+		params: [
+			{
+				type: 'Block',
+				accept: 'string'
+			},
+			{
+				type: 'Indicator',
+				img: 'block_icon/start_icon_play.svg',
+				size: 11,
+			}
+		],
+		def: [
+			{
+				type: 'text',
+				params: ['https://playentry.org']
+			},
+			null
+		],
+		map: {
+			WEBSITE: 0
+		},
+		class: 'text',
+		func: async (sprite, script, unit) => {
+			return script.split(unit)
+		},
+	}
+]
+LibraryCreator.start(blocks, 'API', '크넛블록');
+async function BlockLoad() {
+	if(Entry.getMainWS() && Entry.projectId) {
+	const TempProjectId = Entry.projectId;
+	const TempExportedProject = Entry.exportProject();
+	const ProjectData = await (await fetch(`https://playentry.org/api/project/${Entry.projectId}`)).json();
+	Entry.clearProject();
+	Entry.loadProject(Object.keys(TempExportedProject).reduce((acc, cur) => {
+	acc[cur] = ProjectData[cur];
+	return acc;
+	}, {}));
+	Entry.projectId = TempProjectId;
+	}
+	}
+BlockLoad();
